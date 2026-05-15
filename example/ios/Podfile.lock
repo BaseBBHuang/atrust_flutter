@@ -1,0 +1,28 @@
+PODS:
+  - atrust_flutter (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - atrust_flutter (from `.symlinks/plugins/atrust_flutter/ios`)
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+
+EXTERNAL SOURCES:
+  atrust_flutter:
+    :path: ".symlinks/plugins/atrust_flutter/ios"
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+
+SPEC CHECKSUMS:
+  atrust_flutter: f258b16b2a9df1cd55fd3657b70b3da92d5d976f
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  integration_test: 2d03ab552da9a1f408709a6acf3d7ca4cb3cb307
+
+PODFILE CHECKSUM: 6e700dec67e6deac9b1c69bb14c49a2217a12d15
+
+COCOAPODS: 1.16.2
