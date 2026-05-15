@@ -5,6 +5,8 @@
             <error code="6" note="无法解析主机名, 请检查DNS配置" />
             <error code="7" note="无法连接到服务器" />
             <error code="28" note="连接服务器超时" />
+            <error code="60" note="服务器证书校验失败，请联系管理员" />
+            <error code="100" note="无法连接到服务器" />
             <error code="302" note="无法连接服务器" />
             <error code="422" note="参数错误" />
             <error code="502" note="服务器出现异常" />
@@ -242,6 +244,8 @@
             <error code="6" note="Failed to parse the hostname" />
             <error code="7" note="Failed to connect to the server." />
             <error code="28" note="Server connection timed out." />
+            <error code="60" note="Failed to verify the server certificate. Please contact the administrator" />
+            <error code="100" note="Failed to connect to the server." />
             <error code="302" note="Failed to connect to the server." />
             <error code="422" note="Parameter error." />
             <error code="502" note="Server exception." />

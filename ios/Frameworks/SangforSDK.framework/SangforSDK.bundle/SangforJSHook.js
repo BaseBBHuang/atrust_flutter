@@ -893,7 +893,7 @@ var __values = (this && this.__values) || function (o) {
                         method = ori.method
                     }
                     if (ori.headers) {
-                        headers = ori.headers
+                        headers = ori.headers;
                     } else {
                         ori.headers = headers;
                     }
@@ -912,7 +912,6 @@ var __values = (this && this.__values) || function (o) {
                     if ((method == "GET") || (method == "get") || (method == "HEAD") || (method == "head")) {
                         return [url, config];
                     }
-                    
                     if (config.headers) {
                         headers = config.headers;
                     } else {
@@ -924,12 +923,14 @@ var __values = (this && this.__values) || function (o) {
                     }
                 }
 
-                
                 var uniqueID = Math.round(Math.random() * 10000000) + "";
-
+				
                 if (headers instanceof Headers) {
                     headers.append("sangfor_sftaskid", uniqueID);
                     headers.append("sangfor_sftaskid_cors" + uniqueID, "1")
+                } else if(Array.isArray(headers)) {
+                    headers.push(["sangfor_sftaskid", uniqueID]);
+                    headers.push(["sangfor_sftaskid_cors" + uniqueID, "1"]);
                 } else {
                     headers["sangfor_sftaskid"] = uniqueID;
                     headers["sangfor_sftaskid_cors" + uniqueID] = "1";
@@ -960,6 +961,8 @@ var __values = (this && this.__values) || function (o) {
                         // formData 表单
                         if (headers instanceof Headers) {
                             headers.append("sangfor_isformdata", "1");
+                        } else if(Array.isArray(headers)) {
+                            headers.push(["sangfor_isformdata", 1]);
                         } else {
                             headers["sangfor_isformdata"] = "1";
                         }
@@ -970,6 +973,28 @@ var __values = (this && this.__values) || function (o) {
                             requestParamsToOC.title = "FixDropBodyFormData"
                             sf_sendEvent(requestParamsToOC)
                          });
+                    } else if (body instanceof File || body instanceof Blob) {
+                        // [网上问题][Q2024061901046]图片上传失败，需要兼容blob格式
+                        // Blob的处理可以复用File的逻辑
+                        //iOS16也会有body丢失的问题，测试上传一个0.2M的普通文件也会丢失body
+                        sendLogToOC("body data is File...");
+                        var form = new FormData();
+                        form.append('file', body);
+                        // formData 表单
+                        if (headers instanceof Headers) {
+                            headers.append("sangfor_isformdata", "1");
+                        } else if(Array.isArray(headers)) {
+                            headers.push(["sangfor_isformdata", "1"]);
+                        } else {
+                            headers["sangfor_isformdata"] = "1";
+                        }
+                        SFJSBridgeUtil.convertFormDataToJson(form, function (json) {
+
+                            sendLogToOC("parse formData json:" + JSON.stringify(json));
+                            requestParamsToOC.data = json;
+                            requestParamsToOC.title = "FixDropBodyFormData"
+                            sf_sendEvent(requestParamsToOC)
+                        });
                     } else {
                         if(iosVersion && (iosVersion < 12)) {
                             sendLogToOC("body data is Others such as String...");
@@ -1008,7 +1033,9 @@ var __values = (this && this.__values) || function (o) {
                     set: function (val) {
                         window.webkit.messageHandlers.sf_setCookieHandler.postMessage(val);
                         cookieDesc.set.call(document, val);
-                    }
+                    },
+                    enumerable: true,
+					configurable: true
                 });
             }
         } catch (e) {

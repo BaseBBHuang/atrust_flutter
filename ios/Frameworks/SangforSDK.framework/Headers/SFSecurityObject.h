@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger errCode;
 /*! 错误提示字符串 */
 @property (nonatomic, copy) NSString *errStr;
+/*! 自定义错误提示标题 */
+@property (nonatomic, copy) NSString *errTitle;
 /*! 服务端透传字符串 */
 @property (nonatomic, copy) NSString *serverInfo;
 /*! 增强认证触发条件 */
@@ -90,6 +92,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *macAddress;
 @end
 
+
+@interface SFTrustDeviceConfig : NSObject
+/*! 是否启用授信终端解绑 */
+@property (nonatomic, assign) BOOL enable;
+/*! 移动端授信终端限制绑定数目 */
+@property (nonatomic, assign) NSInteger mobileLimit;
+/*! 是否禁止自助解绑 */
+@property (nonatomic, assign) NSInteger disableSelfUnbind;
+/*! 绑定数目超限提示中文 */
+@property (nonatomic, copy) NSString *mobileZh;
+/*!  绑定数目超限提示英文*/
+@property (nonatomic, copy) NSString *mobileEn;
+@end
+
 @interface SFTrustDeviceInfo : NSObject
 @property (nonatomic, copy) NSString *deviceId;
 @property (nonatomic, copy) NSString *deviceName;
@@ -123,6 +139,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *time;
 /*!最后一次申请绑定相关信息 */
 @property (nonatomic, strong) SFDeviceLastApplyInfo *lastApplyInfo;
+/*!授信终端解绑配置信息 */
+@property (nonatomic, strong) SFTrustDeviceConfig *trustDeviceConfig;
 /*!绑定的授信终端列表 */
 @property (nonatomic, strong) NSArray<SFTrustDeviceInfo *> *trustedDeviceList;
 @end

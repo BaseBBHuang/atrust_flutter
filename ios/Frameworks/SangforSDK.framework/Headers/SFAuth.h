@@ -82,6 +82,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)allowResetPassword;
 
+/**
+ * 是否处于逃生状态
+ * @returns true表示处于逃生状态
+ */
+- (BOOL)isInRescueState;
+
 @end
 
 NS_ASSUME_NONNULL_END

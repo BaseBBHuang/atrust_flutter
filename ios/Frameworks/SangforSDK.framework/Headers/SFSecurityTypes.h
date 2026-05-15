@@ -47,6 +47,7 @@ typedef NS_ENUM(NSInteger, SFSDKFlags) {
     SFSDKFlagsDisableBreakPad            = 1<<18,        //不初始化breakPad
     SFSDKFlagsDisableIpv6Resolve         = 1<<19,        // 针对接入服务器的地址不做ipv6解析，
                                                          // 用于处理某些用户ipv6解析无响应导致整体解析慢的问题, 当前仅对SDP生效
+    SFSDKFlagsOldWebViewScheme           = 1<<25,        // 使用老的的Webview引流方案(新方案支持iOS12.4上系统,兼容性更好不建议设置)
 };
 
 /// 认证状态

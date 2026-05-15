@@ -237,6 +237,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (SFAuthStatus)getAuthStatus;
 
+/**
+ * 是否处于逃生状态
+ * @returns true表示处于逃生状态
+ */
+- (BOOL)isInRescueState;
+
 #pragma mark - 沙箱
 /**
  * @brief  设置白名单

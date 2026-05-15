@@ -1,5 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ChangeLogs>
+	<ChangeLog Version="2.4.9.1" SubVersion="" Date="2024-02-23">
+		<ChangeList>修复网上问题</ChangeList>
+		<ChangeList>aTrust支持水印样式自定义</ChangeList>
+		<ChangeList>aTrust支持辅助认证多选一</ChangeList>
+	</ChangeLog>
+	<ChangeLog Version="2.4.8.1" SubVersion="" Date="2024-01-05">
+		<ChangeList>修复网上问题</ChangeList>
+		<ChangeList>aTrust支持接收并预览封装应用分享的文件</ChangeList>
+	</ChangeLog>
+	<ChangeLog Version="2.4.6.1" SubVersion="" Date="2023-12-01">
+		<ChangeList>修复网上问题</ChangeList>
+		<ChangeList>aTrust文件预览支持预览视频文件</ChangeList>
+		<ChangeList>截屏审计对接日志中心支持走隧道</ChangeList>
+	</ChangeLog>
+	<ChangeLog Version="2.4.4.1" SubVersion="" Date="2023-11-01">
+		<ChangeList>修复网上问题</ChangeList>
+		<ChangeList>IOS 封装支持ABM</ChangeList>
+		<ChangeList>支持SDK Bypass</ChangeList>
+		<ChangeList>移动端支持ROOT、无锁屏密码监测</ChangeList>
+	</ChangeLog>
+	<ChangeLog Version="2.4.2.1" SubVersion="" Date="2023-09-28">
+		<ChangeList>接入模式启动关闭隧道交互体验优化</ChangeList>
+		<ChangeList>支持TOTP令牌认证码的粘贴</ChangeList>
+	</ChangeLog>
+	<ChangeLog Version="2.3.10.1" SubVersion="" Date="2023-08-15">
+		<ChangeList>手机端H5应用支持横竖屏切换</ChangeList>
+		<ChangeList>aTrust支持大字模式</ChangeList>
+	</ChangeLog>
 	<ChangeLog Version="2.3.6.1" SubVersion="" Date="2023-07-07">
 		<ChangeList>aTrust支持交互式远程日志获取功能</ChangeList>
 	</ChangeLog>
