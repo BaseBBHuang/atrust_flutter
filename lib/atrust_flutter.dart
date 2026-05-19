@@ -12,6 +12,11 @@ class AtrustFlutter {
     return AtrustFlutterPlatform.instance.authenticate(url, username, password);
   }
 
+  static Future<Map<String, dynamic>> commonHttpsRequest(
+      String url, String type, String value) async {
+    return AtrustFlutterPlatform.instance.commonHttpsRequest(url, type, value);
+  }
+
   /// 注销
   static Future<void> logout() async {
     return AtrustFlutterPlatform.instance.logout();

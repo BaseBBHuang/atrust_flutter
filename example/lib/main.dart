@@ -32,8 +32,8 @@ class _MyAppState extends State<MyApp> {
               onPressed: () {
                 AtrustFlutter.authenticate(
                   'https://221.11.50.211:10987',
-                  'zhangke ',
-                  'Hxtx@123',
+                  'xuanyu',
+                  'xuanyu',
                 );
               },
               child: const Text('认证'),

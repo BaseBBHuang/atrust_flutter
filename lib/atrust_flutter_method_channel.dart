@@ -33,6 +33,20 @@ class MethodChannelAtrustFlutter extends AtrustFlutterPlatform {
     }
   }
 
+  @override
+  Future<Map<String, dynamic>> commonHttpsRequest(
+      String url, String type, String value) async {
+    try {
+      final result = await methodChannel.invokeMapMethod<String, dynamic>(
+        'commonHttpsRequest',
+        {'url': url, 'type': type, 'value': value},
+      );
+      return result ?? <String, dynamic>{};
+    } on PlatformException catch (e) {
+      throw Exception("通用HTTPS请求失败: ${e.message}");
+    }
+  }
+
   /// 访问受保护资源
   @override
   Future<void> logout() async {

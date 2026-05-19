@@ -19,10 +19,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/integration_test/ios"
 
 SPEC CHECKSUMS:
-  atrust_flutter: f258b16b2a9df1cd55fd3657b70b3da92d5d976f
+  atrust_flutter: ec8b45b8a232dde2c190bbfa7c28f90419243a1e
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  integration_test: 2d03ab552da9a1f408709a6acf3d7ca4cb3cb307
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
 
-PODFILE CHECKSUM: 6e700dec67e6deac9b1c69bb14c49a2217a12d15
+PODFILE CHECKSUM: 3fa3b71e93b773646ea923db9defae9e3f1717ab
 
 COCOAPODS: 1.16.2

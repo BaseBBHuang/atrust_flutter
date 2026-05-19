@@ -34,6 +34,11 @@ abstract class AtrustFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('authenticate() has not been implemented.');
   }
 
+  Future<Map<String, dynamic>> commonHttpsRequest(
+      String url, String type, String value) async {
+    throw UnimplementedError('commonHttpsRequest() has not been implemented.');
+  }
+
   /// 注销
   Future<void> logout() async {
     throw UnimplementedError('requestResource() has not been implemented.');

@@ -12,6 +12,11 @@ class MockAtrustFlutterPlatform
       Future.value();
 
   @override
+  Future<Map<String, dynamic>> commonHttpsRequest(
+          String url, String type, String value) =>
+      Future.value(<String, dynamic>{});
+
+  @override
   Future<void> initSDK() => Future.value();
 
   @override
