@@ -7,7 +7,7 @@ class AtrustFlutter {
   }
 
   /// 用户认证
-  static Future<void> authenticate(
+  static Future<Map<String, dynamic>> authenticate(
       String url, String username, String password) async {
     return AtrustFlutterPlatform.instance.authenticate(url, username, password);
   }

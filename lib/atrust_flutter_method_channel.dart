@@ -21,13 +21,14 @@ class MethodChannelAtrustFlutter extends AtrustFlutterPlatform {
 
   /// 用户认证
   @override
-  Future<void> authenticate(
+  Future<Map<String, dynamic>> authenticate(
       String url, String username, String password) async {
     try {
-      await methodChannel.invokeMethod(
+      final result = await methodChannel.invokeMapMethod<String, dynamic>(
         'authenticate',
         {'url': url, 'username': username, 'password': password},
       );
+      return result ?? <String, dynamic>{};
     } on PlatformException catch (e) {
       throw Exception("认证失败: ${e.message}");
     }

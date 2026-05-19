@@ -8,8 +8,9 @@ class MockAtrustFlutterPlatform
     with MockPlatformInterfaceMixin
     implements AtrustFlutterPlatform {
   @override
-  Future<void> authenticate(String url, String username, String password) =>
-      Future.value();
+  Future<Map<String, dynamic>> authenticate(
+          String url, String username, String password) =>
+      Future.value(<String, dynamic>{});
 
   @override
   Future<Map<String, dynamic>> commonHttpsRequest(

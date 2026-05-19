@@ -29,7 +29,7 @@ abstract class AtrustFlutterPlatform extends PlatformInterface {
   }
 
   /// 用户认证
-  Future<void> authenticate(
+  Future<Map<String, dynamic>> authenticate(
       String url, String username, String password) async {
     throw UnimplementedError('authenticate() has not been implemented.');
   }
