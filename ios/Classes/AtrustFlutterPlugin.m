@@ -76,28 +76,30 @@
     }
 }
 
-- (void)onAuthFailed:(nonnull SFBaseMessage *)message { 
+- (void)onAuthFailed:(nonnull SFBaseMessage *)message {
+    NSLog(@"AtrustFlutterPlugin onAuthFailed: code=%ld, msg=%@", (long)message.errCode, message.errStr);
     if (self.authResult) {
         NSDictionary *resultDict = @{
-            @"success": @NO,
-            @"message": message.errStr ?: @"认证失败",
-            @"code": @(message.errCode)
+            @"mErrCode": @(message.errCode),
+            @"mErrStr":  message.errStr ?: @"认证失败",
         };
         self.authResult(resultDict);
         self.authResult = nil;
     }
 }
 
-- (void)onAuthProcess:(SFAuthType)nextAuthType message:(nonnull SFBaseMessage *)message { 
-    NSLog(@"AtrustFlutterPlugin onAuthProcess:%ld, msg:%@", (long)nextAuthType, message.errStr);
+- (void)onAuthProcess:(SFAuthType)nextAuthType message:(nonnull SFBaseMessage *)message {
+    // 仅打日志，不回调 result（避免同一个 FlutterResult 被多次调用导致异常）
+    NSLog(@"AtrustFlutterPlugin onAuthProcess: nextType=%ld, code=%ld, msg=%@",
+          (long)nextAuthType, (long)message.errCode, message.errStr);
 }
 
-- (void)onAuthSuccess:(nonnull SFBaseMessage *)message { 
+- (void)onAuthSuccess:(nonnull SFBaseMessage *)message {
+    NSLog(@"AtrustFlutterPlugin onAuthSuccess: code=%ld, msg=%@", (long)message.errCode, message.errStr);
     if (self.authResult) {
         NSDictionary *resultDict = @{
-            @"success": @YES,
-            @"message": @"认证成功",
-            @"code": @(message.errCode)
+            @"mErrCode": @(message.errCode),
+            @"mErrStr":  message.errStr ?: @"认证成功",
         };
         self.authResult(resultDict);
         self.authResult = nil;
