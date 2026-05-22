@@ -65,13 +65,19 @@
         // 不需要业务侧手动走 SOCKS5。返回 0 让上层 Dio 不开启代理。
         result(@(0));
     } else if ([@"getTunnelStatus" isEqualToString:call.method]) {
-        SFTunnelStatus s = [[SFUemSDK sharedInstance].tunnel getTunnelStatus];
         NSString *name = @"UNKNOWN";
-        switch (s) {
-            case SFTunnelStatus_INIT:    name = @"INIT";    break;
-            case SFTunnelStatus_ONLINE:  name = @"ONLINE";  break;
-            case SFTunnelStatus_OFFLINE: name = @"OFFLINE"; break;
-            default: break;
+        @try {
+            SFTunnelStatus s = [[SFUemSDK sharedInstance].tunnel getTunnelStatus];
+            switch (s) {
+                case SFTunnelStatus_INIT:    name = @"INIT";    break;
+                case SFTunnelStatus_ONLINE:  name = @"ONLINE";  break;
+                case SFTunnelStatus_OFFLINE: name = @"OFFLINE"; break;
+                default: break;
+            }
+        } @catch (NSException *ex) {
+            // 非 L3VPN 模式（HOST_APPLICATION + TCP）下 iOS SDK 会抛
+            // 异常 "current mode do not support l3vpn."，此处吞掉返回 UNKNOWN
+            NSLog(@"AtrustFlutterPlugin getTunnelStatus exception: %@", ex.reason);
         }
         result(name);
     } else if ([@"startTunnel" isEqualToString:call.method]) {
@@ -79,7 +85,12 @@
         result(nil);
     } else if ([@"startTunnelAndWait" isEqualToString:call.method]) {
         SFTunnel *tunnel = [SFUemSDK sharedInstance].tunnel;
-        if ([tunnel getTunnelStatus] == SFTunnelStatus_ONLINE) {
+        SFTunnelStatus currentStatus = SFTunnelStatus_UNKNOWN;
+        @try { currentStatus = [tunnel getTunnelStatus]; }
+        @catch (NSException *ex) {
+            NSLog(@"AtrustFlutterPlugin getTunnelStatus exception: %@", ex.reason);
+        }
+        if (currentStatus == SFTunnelStatus_ONLINE) {
             result(@{@"success": @(YES), @"message": @"already ONLINE", @"status": @"ONLINE"});
             return;
         }
