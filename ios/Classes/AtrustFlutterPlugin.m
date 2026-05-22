@@ -1,9 +1,10 @@
 #import "AtrustFlutterPlugin.h"
 #import <SangforSDK/SFUemSDK.h>
 
-@interface AtrustFlutterPlugin () <SFAuthResultDelegate, SFLogoutDelegate, SFCommonHttpsRequestResultDelegate>
+@interface AtrustFlutterPlugin () <SFAuthResultDelegate, SFLogoutDelegate, SFCommonHttpsRequestResultDelegate, SFTunnelStatusDelegate>
 @property (nonatomic, strong) FlutterResult authResult;
 @property (nonatomic, strong) FlutterResult commonHttpsRequestResult;
+@property (nonatomic, strong) FlutterResult tunnelWaitResult;
 @end
 
 @implementation AtrustFlutterPlugin
@@ -59,9 +60,64 @@
     } else if ([@"logout" isEqualToString:call.method]) {
         [[SFUemSDK sharedInstance] cancelAuth];
         result(nil);
+    } else if ([@"getSocks5ProxyPort" isEqualToString:call.method]) {
+        // iOS SDK 通过 NSURLProtocol/CFNetwork hook 自动拦截网络请求，
+        // 不需要业务侧手动走 SOCKS5。返回 0 让上层 Dio 不开启代理。
+        result(@(0));
+    } else if ([@"getTunnelStatus" isEqualToString:call.method]) {
+        SFTunnelStatus s = [[SFUemSDK sharedInstance].tunnel getTunnelStatus];
+        NSString *name = @"UNKNOWN";
+        switch (s) {
+            case SFTunnelStatus_INIT:    name = @"INIT";    break;
+            case SFTunnelStatus_ONLINE:  name = @"ONLINE";  break;
+            case SFTunnelStatus_OFFLINE: name = @"OFFLINE"; break;
+            default: break;
+        }
+        result(name);
+    } else if ([@"startTunnel" isEqualToString:call.method]) {
+        [[SFUemSDK sharedInstance].tunnel startTunnel];
+        result(nil);
+    } else if ([@"startTunnelAndWait" isEqualToString:call.method]) {
+        SFTunnel *tunnel = [SFUemSDK sharedInstance].tunnel;
+        if ([tunnel getTunnelStatus] == SFTunnelStatus_ONLINE) {
+            result(@{@"success": @(YES), @"message": @"already ONLINE", @"status": @"ONLINE"});
+            return;
+        }
+        self.tunnelWaitResult = result;
+        [tunnel setTunnelStatusDelegate:self];
+
+        NSNumber *timeout = call.arguments[@"timeoutMs"];
+        NSTimeInterval seconds = (timeout ? timeout.doubleValue : 15000.0) / 1000.0;
+        __weak typeof(self) weakSelf = self;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(seconds * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(), ^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (strongSelf.tunnelWaitResult) {
+                strongSelf.tunnelWaitResult(@{@"success": @(NO), @"message": @"timeout", @"status": @"TIMEOUT"});
+                strongSelf.tunnelWaitResult = nil;
+                [tunnel setTunnelStatusDelegate:nil];
+            }
+        });
+
+        [tunnel startTunnel];
     } else {
     result(FlutterMethodNotImplemented);
   }
+}
+
+#pragma mark - SFTunnelStatusDelegate
+- (void)onTunnelStatusChanged:(SFTunnelStatus)status {
+    NSLog(@"AtrustFlutterPlugin tunnel status changed: %ld", (long)status);
+    if (!self.tunnelWaitResult) return;
+    if (status == SFTunnelStatus_ONLINE) {
+        self.tunnelWaitResult(@{@"success": @(YES), @"message": @"ONLINE", @"status": @"ONLINE"});
+        self.tunnelWaitResult = nil;
+        [[SFUemSDK sharedInstance].tunnel setTunnelStatusDelegate:nil];
+    } else if (status == SFTunnelStatus_OFFLINE) {
+        self.tunnelWaitResult(@{@"success": @(NO), @"message": @"OFFLINE", @"status": @"OFFLINE"});
+        self.tunnelWaitResult = nil;
+        [[SFUemSDK sharedInstance].tunnel setTunnelStatusDelegate:nil];
+    }
 }
 
 - (void)onCommonHttpsRequestResult:(SFBaseMessage *)msg {

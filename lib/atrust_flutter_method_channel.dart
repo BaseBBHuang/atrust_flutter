@@ -57,4 +57,47 @@ class MethodChannelAtrustFlutter extends AtrustFlutterPlatform {
       throw Exception("请求失败: ${e.message}");
     }
   }
+
+  @override
+  Future<int> getSocks5ProxyPort() async {
+    try {
+      final port = await methodChannel.invokeMethod<int>('getSocks5ProxyPort');
+      return port ?? 0;
+    } on PlatformException catch (e) {
+      throw Exception("获取SOCKS5代理端口失败: ${e.message}");
+    }
+  }
+
+  @override
+  Future<String> getTunnelStatus() async {
+    try {
+      final s = await methodChannel.invokeMethod<String>('getTunnelStatus');
+      return s ?? 'UNKNOWN';
+    } on PlatformException catch (e) {
+      throw Exception("获取隧道状态失败: ${e.message}");
+    }
+  }
+
+  @override
+  Future<void> startTunnel() async {
+    try {
+      await methodChannel.invokeMethod('startTunnel');
+    } on PlatformException catch (e) {
+      throw Exception("启动隧道失败: ${e.message}");
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> startTunnelAndWait(
+      {int timeoutMs = 15000}) async {
+    try {
+      final r = await methodChannel.invokeMapMethod<String, dynamic>(
+        'startTunnelAndWait',
+        {'timeoutMs': timeoutMs},
+      );
+      return r ?? <String, dynamic>{};
+    } on PlatformException catch (e) {
+      throw Exception("启动隧道失败: ${e.message}");
+    }
+  }
 }

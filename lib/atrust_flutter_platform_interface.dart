@@ -43,4 +43,25 @@ abstract class AtrustFlutterPlatform extends PlatformInterface {
   Future<void> logout() async {
     throw UnimplementedError('requestResource() has not been implemented.');
   }
+
+  /// 获取 SDK 本地 SOCKS5 代理端口（Dio 走该端口流量才会进隧道）
+  Future<int> getSocks5ProxyPort() async {
+    throw UnimplementedError('getSocks5ProxyPort() has not been implemented.');
+  }
+
+  /// 获取隧道状态：INIT / ONLINE / OFFLINE
+  Future<String> getTunnelStatus() async {
+    throw UnimplementedError('getTunnelStatus() has not been implemented.');
+  }
+
+  /// 手动启动隧道
+  Future<void> startTunnel() async {
+    throw UnimplementedError('startTunnel() has not been implemented.');
+  }
+
+  /// 启动隧道并等待上线，返回 结果 map：{success: bool, message: String, status: String}
+  Future<Map<String, dynamic>> startTunnelAndWait(
+      {int timeoutMs = 15000}) async {
+    throw UnimplementedError('startTunnelAndWait() has not been implemented.');
+  }
 }

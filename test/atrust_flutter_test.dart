@@ -22,6 +22,19 @@ class MockAtrustFlutterPlatform
 
   @override
   Future<void> logout() => Future.value();
+
+  @override
+  Future<int> getSocks5ProxyPort() => Future.value(0);
+
+  @override
+  Future<String> getTunnelStatus() => Future.value('UNKNOWN');
+
+  @override
+  Future<void> startTunnel() => Future.value();
+
+  @override
+  Future<Map<String, dynamic>> startTunnelAndWait({int timeoutMs = 15000}) =>
+      Future.value(<String, dynamic>{'success': true});
 }
 
 void main() {

@@ -139,6 +139,88 @@ class AtrustFlutterPlugin: FlutterPlugin, MethodCallHandler {
         }
       }
 
+      "getSocks5ProxyPort" -> {
+        try {
+          val port = SFUemSDK.getInstance().getSocks5ProxyPort()
+          result.success(port)
+        } catch (e: Exception) {
+          result.error("1004", e.message, null)
+        }
+      }
+
+      "getTunnelStatus" -> {
+        try {
+          val status = SFUemSDK.getInstance().getSFTunnel().getTunnelStatus()
+          // INIT / ONLINE / OFFLINE
+          result.success(status?.name ?: "UNKNOWN")
+        } catch (e: Exception) {
+          result.error("1005", e.message, null)
+        }
+      }
+
+      "startTunnel" -> {
+        try {
+          SFUemSDK.getInstance().getSFTunnel().startTunnel()
+          result.success(null)
+        } catch (e: Exception) {
+          result.error("1006", e.message, null)
+        }
+      }
+
+      "startTunnelAndWait" -> {
+        // 注册一次性监听器，启动隧道，等隧道上线/失败再回调 Flutter
+        val timeoutMs = (call.argument<Int>("timeoutMs") ?: 15000).toLong()
+        val tunnel = SFUemSDK.getInstance().getSFTunnel()
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        val replied = java.util.concurrent.atomic.AtomicBoolean(false)
+        var listenerRef: com.sangfor.sdk.base.SFTunnelStatusListener? = null
+
+        fun reply(success: Boolean, msg: String?) {
+          if (replied.compareAndSet(false, true)) {
+            listenerRef?.let { tunnel.unRegisterTunnelStatusListener(it) }
+            val map: MutableMap<String, Any?> = mutableMapOf()
+            map["success"] = success
+            map["message"] = msg ?: ""
+            map["status"] = tunnel.getTunnelStatus()?.name ?: "UNKNOWN"
+            handler.post { result.success(map) }
+          }
+        }
+
+        listenerRef = object : com.sangfor.sdk.base.SFTunnelStatusListener {
+          override fun onTunnelStatusChanged(status: com.sangfor.sdk.base.SFTunnelStatus) {
+            Log.d(TAG, "tunnel status changed: ${status.name}")
+            if (status == com.sangfor.sdk.base.SFTunnelStatus.ONLINE) {
+              reply(true, "ONLINE")
+            } else if (status == com.sangfor.sdk.base.SFTunnelStatus.OFFLINE) {
+              reply(false, "OFFLINE")
+            }
+          }
+          override fun onTunnelStarted(message: com.sangfor.sdk.base.SFBaseMessage) {
+            Log.d(TAG, "onTunnelStarted: ${message.mErrCode} ${message.mErrStr}")
+            if (message.mErrCode != 0L && message.mErrCode != 1000L) {
+              reply(false, "code=${message.mErrCode}, ${message.mErrStr}")
+            }
+          }
+          override fun onTunnelStoped() {
+            Log.d(TAG, "onTunnelStoped")
+            reply(false, "STOPPED")
+          }
+        }
+
+        try {
+          tunnel.registerTunnelStatusListener(listenerRef)
+          // 已经在线就直接返回
+          if (tunnel.getTunnelStatus() == com.sangfor.sdk.base.SFTunnelStatus.ONLINE) {
+            reply(true, "already ONLINE")
+          } else {
+            tunnel.startTunnel()
+            handler.postDelayed({ reply(false, "timeout") }, timeoutMs)
+          }
+        } catch (e: Exception) {
+          reply(false, e.message)
+        }
+      }
+
       else -> result.notImplemented()
     }
   }
