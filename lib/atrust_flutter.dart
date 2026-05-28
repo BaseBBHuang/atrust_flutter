@@ -17,6 +17,14 @@ class AtrustFlutter {
     return AtrustFlutterPlatform.instance.commonHttpsRequest(url, type, value);
   }
 
+  static Future<String> getSDKLogDir() {
+    return AtrustFlutterPlatform.instance.getSDKLogDir();
+  }
+
+  static Future<String> packLog({String? zipPath}) {
+    return AtrustFlutterPlatform.instance.packLog(zipPath: zipPath);
+  }
+
   /// 注销
   static Future<void> logout() async {
     return AtrustFlutterPlatform.instance.logout();

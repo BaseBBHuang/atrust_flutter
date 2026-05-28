@@ -25,6 +25,12 @@
         [[SFUemSDK sharedInstance] setAuthResultDelegate:self];
         [[SFUemSDK sharedInstance] setCommonHttpsRequestResultDelegate:self];
         [[SFUemSDK sharedInstance] registerLogoutDelegate:self];
+
+        [[SFUemSDK sharedInstance].log setLogLevel:SFLogLevelDebug];
+
+        NSString *path = [[SFUemSDK sharedInstance].log getSDKLogDir];
+        NSLog(@"Atrust SDK log dir: %@", path);
+
         result(nil);
     } else if ([@"authenticate" isEqualToString:call.method]) {
         self.authResult = result;
@@ -57,8 +63,36 @@
 
         self.commonHttpsRequestResult = result;
         [[SFUemSDK sharedInstance] commonHttpsRequest:url type:type value:value];
+    } else if ([@"getSDKLogDir" isEqualToString:call.method]) {
+        NSString *path = [[SFUemSDK sharedInstance].log getSDKLogDir];
+        result(path ?: @"");
+    } else if ([@"packLog" isEqualToString:call.method]) {
+        NSDictionary *arguments = call.arguments;
+        NSString *zipPath = arguments[@"zipPath"];
+        if (![zipPath isKindOfClass:[NSString class]] || zipPath.length == 0) {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+            NSString *cachePath = paths.firstObject;
+            NSString *fileName = [NSString stringWithFormat:@"atrust_sdk_log_%lld.zip", (long long)([[NSDate date] timeIntervalSince1970] * 1000)];
+            zipPath = [cachePath stringByAppendingPathComponent:fileName];
+        }
+        NSString *logDir = [[SFUemSDK sharedInstance].log getSDKLogDir];
+        NSLog(@"Atrust SDK log dir before pack: %@", logDir);
+        NSLog(@"Atrust SDK log zip path: %@", zipPath);
+        NSString *path = [[SFUemSDK sharedInstance].log packLog:zipPath];
+        if (path.length == 0) {
+            NSDictionary *details = @{
+                @"logDir": logDir ?: @"",
+                @"zipPath": zipPath ?: @""
+            };
+            result([FlutterError errorWithCode:@"1007" message:@"SDK日志打包失败" details:details]);
+            return;
+        }
+        NSLog(@"Atrust SDK log packed path: %@", path);
+        result(path);
     } else if ([@"logout" isEqualToString:call.method]) {
-        [[SFUemSDK sharedInstance] cancelAuth];
+        [[SFUemSDK sharedInstance] registerLogoutDelegate:self];
+        [[SFUemSDK sharedInstance] logout];
+
         result(nil);
     } else if ([@"getSocks5ProxyPort" isEqualToString:call.method]) {
         // iOS SDK 通过 NSURLProtocol/CFNetwork hook 自动拦截网络请求，
@@ -77,7 +111,7 @@
         } @catch (NSException *ex) {
             // 非 L3VPN 模式（HOST_APPLICATION + TCP）下 iOS SDK 会抛
             // 异常 "current mode do not support l3vpn."，此处吞掉返回 UNKNOWN
-            NSLog(@"AtrustFlutterPlugin getTunnelStatus exception: %@", ex.reason);
+            NSLog(@"Atrust FlutterPlugin getTunnelStatus exception: %@", ex.reason);
         }
         result(name);
     } else if ([@"startTunnel" isEqualToString:call.method]) {
@@ -88,7 +122,7 @@
         SFTunnelStatus currentStatus = SFTunnelStatus_UNKNOWN;
         @try { currentStatus = [tunnel getTunnelStatus]; }
         @catch (NSException *ex) {
-            NSLog(@"AtrustFlutterPlugin getTunnelStatus exception: %@", ex.reason);
+            NSLog(@"Atrust FlutterPlugin getTunnelStatus exception: %@", ex.reason);
         }
         if (currentStatus == SFTunnelStatus_ONLINE) {
             result(@{@"success": @(YES), @"message": @"already ONLINE", @"status": @"ONLINE"});
@@ -162,7 +196,7 @@
 }
 
 - (void)onAuthSuccess:(nonnull SFBaseMessage *)message {
-    NSLog(@"AtrustFlutterPlugin onAuthSuccess: code=%ld, msg=%@", (long)message.errCode, message.errStr);
+    NSLog(@"AtrustFlutterPlugin onAuthSuccess: code=%ld, msg=%@, name=%@", (long)message.errCode, message.errStr, message.displayName);
     if (self.authResult) {
         NSDictionary *resultDict = @{
             @"mErrCode": @(message.errCode),

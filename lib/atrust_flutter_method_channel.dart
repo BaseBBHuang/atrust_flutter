@@ -48,6 +48,29 @@ class MethodChannelAtrustFlutter extends AtrustFlutterPlatform {
     }
   }
 
+  @override
+  Future<String> getSDKLogDir() async {
+    try {
+      final path = await methodChannel.invokeMethod<String>('getSDKLogDir');
+      return path ?? '';
+    } on PlatformException catch (e) {
+      throw Exception("获取SDK日志路径失败: ${e.message}");
+    }
+  }
+
+  @override
+  Future<String> packLog({String? zipPath}) async {
+    try {
+      final path = await methodChannel.invokeMethod<String>(
+        'packLog',
+        {'zipPath': zipPath},
+      );
+      return path ?? '';
+    } on PlatformException catch (e) {
+      throw Exception("打包SDK日志失败: ${e.message}");
+    }
+  }
+
   /// 访问受保护资源
   @override
   Future<void> logout() async {

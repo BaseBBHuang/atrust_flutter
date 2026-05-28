@@ -39,6 +39,14 @@ abstract class AtrustFlutterPlatform extends PlatformInterface {
     throw UnimplementedError('commonHttpsRequest() has not been implemented.');
   }
 
+  Future<String> getSDKLogDir() async {
+    throw UnimplementedError('getSDKLogDir() has not been implemented.');
+  }
+
+  Future<String> packLog({String? zipPath}) async {
+    throw UnimplementedError('packLog() has not been implemented.');
+  }
+
   /// 注销
   Future<void> logout() async {
     throw UnimplementedError('requestResource() has not been implemented.');
